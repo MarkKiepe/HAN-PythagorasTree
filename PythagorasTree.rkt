@@ -4,7 +4,7 @@
 
 ; Main Function
 
-(define (draw-pythagoras width height start-size depth)
+(define (draw-pythagoras width height start-size depth color-function)
   ; Creating new bitmap
   (define target (make-bitmap width height))
 
@@ -13,11 +13,12 @@
 
   ; Creating 'painting tools'
   (send dc set-brush "brown" 'solid)
-  (send dc set-pen "transparant" 1 'solid)
+  (send dc set-pen "transparent" 1 'solid)
 
-  ; Drawing pytagoras tree
+  ; Drawing pythagoras tree
   (calculate-and-draw-tree-parts
       dc
+      color-function
       depth
       (- (/ width 2) (/ start-size 2)) ; x1
       height ; y1
@@ -32,7 +33,7 @@
 
 ; Square Functions
 
-(define (calculate-and-draw-tree-parts dc depth-left x1 y1 x2 y2)
+(define (calculate-and-draw-tree-parts dc color-function depth-left x1 y1 x2 y2)
   ; Calculating original size
   (define width (- x2 x1))
   (define height (- y1 y2))
@@ -46,7 +47,7 @@
   (define y5 (- y4 (/ (+ width height) 2)))
 
   ; Changing color
-  (send dc set-brush (get-color-for-depth depth-left) 'solid)
+  (send dc set-brush (color-function depth-left) 'solid)
   
   ; Drawing square
   (draw-square dc x1 y1 x2 y2 x3 y3 x4 y4)
@@ -61,6 +62,7 @@
      ; Drawing Left square
      (calculate-and-draw-tree-parts
         dc ; drawing content
+        color-function ; color function
         (- depth-left 1) ; making progress
         ;
         x4
@@ -72,6 +74,7 @@
      ; Drawing Right square
      (calculate-and-draw-tree-parts
         dc ; drawing content
+        color-function ; color function
         (- depth-left 1) ; making progress
         ;
         x5
@@ -101,7 +104,7 @@
 
 ; Misc functions
 
-(define (get-color-for-depth depth)
+(define (realistic-color depth)
   (cond
     [(<= depth 2) "green"]
     ; else
@@ -109,12 +112,17 @@
   )
 )
 
+(define (green-color depth)
+  "green"
+)
+
 
 ; Initial Function Call
 
 (draw-pythagoras
-    750 ; image width
-    500 ; image height
-    100 ; tree root square size
-    6   ; tree depth
+    750                   ; image width
+    500                   ; image height
+    100                   ; tree root square size
+    6                     ; tree depth
+    realistic-color       ; color-function (function name) CHOOSE: realistic-color or green-color
 )
